@@ -7,7 +7,7 @@ import { z } from 'zod'
 const claimUsernameFormSchema = z.object({
   username: z
     .string()
-    .min(3, { message: 'Usuário precisa ter pelo menos 3 letras.' })
+    .min(3, { message: 'O Usuário precisa ter pelo menos 3 letras.' })
     .regex(/^([a-z\\\\-]+)$/i, {
       message: 'O usuário pode ter apenas letras e hifens.',
     })

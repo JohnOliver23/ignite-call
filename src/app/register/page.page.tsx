@@ -9,8 +9,38 @@ import {
   TextInput,
 } from '@ignite-ui/react'
 import { ArrowRight } from 'phosphor-react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 export default function Register() {
+  const registerFormSchema = z.object({
+    username: z
+      .string()
+      .min(3, { message: 'O Usuário precisa ter pelo menos 3 letras.' })
+      .regex(/^([a-z\\\\-]+)$/i, {
+        message: 'O usuário pode ter apenas letras e hifens.',
+      })
+      .transform((username) => username.toLocaleLowerCase()),
+    name: z
+      .string()
+      .min(3, { message: 'O nome precisa ter pelo menos 3 letras.' }),
+  })
+
+  type RegisterFormData = z.infer<typeof registerFormSchema>
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerFormSchema),
+  })
+
+  async function handleRegister(data: RegisterFormData) {
+    console.log(data)
+  }
+
   return (
     <main className="max-w-[572px] mt-20 mx-auto mb-4  py-0 px-4">
       <div className="py-0 px-6">
@@ -24,15 +54,33 @@ export default function Register() {
 
         <MultiStep size={4} currentStep={1}></MultiStep>
 
-        <Box as="form" className="mt-6 flex flex-col gap-4">
+        <Box
+          as="form"
+          className="mt-6 flex flex-col gap-4"
+          onSubmit={handleSubmit(handleRegister)}
+        >
           <label className="flex flex-col gap-2">
             <Text size="sm"> Nome do usuário </Text>
-            <TextInput prefix="ignite.com/" placeholder="seu-usuário" />
+            <TextInput
+              prefix="ignite.com/"
+              placeholder="seu-usuário"
+              {...register('username')}
+            />
+            {errors.username && (
+              <Text size="sm">
+                <div className="text-red-400">{errors.username.message}</div>
+              </Text>
+            )}
           </label>
 
           <label className="flex flex-col gap-2">
             <Text size="sm"> Nome completo</Text>
-            <TextInput placeholder="Seu nome" />
+            <TextInput placeholder="Seu nome" {...register('name')} />
+            {errors.name && (
+              <Text size="sm">
+                <div className="text-red-400">{errors.name.message}</div>
+              </Text>
+            )}
           </label>
 
           <Button type="submit">
